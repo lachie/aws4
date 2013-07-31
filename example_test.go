@@ -2,11 +2,12 @@ package aws4_test
 
 import (
 	"fmt"
-	"github.com/bmizerany/aws4"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"."
 )
 
 func Example_jSONBody() {
