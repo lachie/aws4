@@ -1,22 +1,40 @@
 package aws4
 
 import (
+	"errors"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 )
 
-var DefaultClient = &Client{Keys: KeysFromEnvironment()}
+var DefaultClient *Client
+
+func init() {
+	keys, err := KeysFromEnvironment()
+	if err == nil {
+		DefaultClient = &Client{Keys: keys}
+	} else {
+		log.Println("WARNING:", err)
+	}
+}
 
 // Initializes and returns a Keys using the AWS_ACCESS_KEY and AWS_SECRET_KEY
 // environment variables.
-func KeysFromEnvironment() *Keys {
-	return &Keys{
+func KeysFromEnvironment() (keys *Keys, err error) {
+	keys = &Keys{
 		AccessKey: os.Getenv("AWS_ACCESS_KEY"),
 		SecretKey: os.Getenv("AWS_SECRET_KEY"),
 	}
+	if keys.AccessKey == "" {
+		err = errors.New("AWS_ACCESS_KEY not found in environment")
+	}
+	if keys.SecretKey == "" {
+		err = errors.New("AWS_SECRET_KEY not found in environment")
+	}
+	return keys, err
 }
 
 // Client is like http.Client, but signs all requests using Keys.
@@ -29,11 +47,17 @@ type Client struct {
 
 // Post works like http.Post, but signs the request with Keys.
 func Post(url string, bodyType string, body io.Reader) (resp *http.Response, err error) {
+	if DefaultClient == nil {
+		return nil, errors.New("no DefaultClient")
+	}
 	return DefaultClient.Post(url, bodyType, body)
 }
 
 // PostForm works like http.PostForm, but signs the request with Keys.
 func PostForm(url string, data url.Values) (resp *http.Response, err error) {
+	if DefaultClient == nil {
+		return nil, errors.New("no DefaultClient")
+	}
 	return DefaultClient.PostForm(url, data)
 }
 
