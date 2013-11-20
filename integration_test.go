@@ -1,11 +1,11 @@
 package aws4
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+	"github.com/nwade/aws4/assert"
 )
 
 
@@ -15,26 +15,22 @@ func TestRequestWithJsonBody(t *testing.T) {
 	r.Header.Set("Content-Type", "application/x-amz-json-1.0")
 	r.Header.Set("X-Amz-Target", "DynamoDB_20111205.ListTables")
 
-	resp, err := DefaultClient.Do(r)
-	if err != nil {
-		log.Fatal(err)
-	}
+	c, err := NewClientFromEnv()
+	assert.NoError(t, err)
 
-	if resp.StatusCode != 200 {
-		t.Errorf("Status code should be 200 but was %d", resp.StatusCode)
-	}
+	resp, err := c.Do(r)
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, 200)
 }
 
 func TestRequestWithFormEncodedBody(t *testing.T) {
 	v := make(url.Values)
 	v.Set("Action", "DescribeAutoScalingGroups")
 
-	resp, err := PostForm("https://autoscaling.us-east-1.amazonaws.com/", v)
-	if err != nil {
-		log.Fatal(err)
-	}
+	c, err := NewClientFromEnv()
+	assert.NoError(t, err)
 
-	if resp.StatusCode != 200 {
-		t.Errorf("Status code should be 200 but was %d", resp.StatusCode)
-	}
+	resp, err := c.PostForm("https://autoscaling.us-east-1.amazonaws.com/", v)
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, 200)
 }
