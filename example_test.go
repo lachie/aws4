@@ -1,4 +1,4 @@
-package aws4_test
+package aws4
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"."
 )
 
 func Example_jSONBody() {
@@ -16,7 +14,7 @@ func Example_jSONBody() {
 	r.Header.Set("Content-Type", "application/x-amz-json-1.0")
 	r.Header.Set("X-Amz-Target", "DynamoDB_20111205.ListTables")
 
-	resp, err := aws4.DefaultClient.Do(r)
+	resp, err := DefaultClient.Do(r)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,7 +28,7 @@ func Example_formEncodedBody() {
 	v := make(url.Values)
 	v.Set("Action", "DescribeAutoScalingGroups")
 
-	resp, err := aws4.PostForm("https://autoscaling.us-east-1.amazonaws.com/", v)
+	resp, err := PostForm("https://autoscaling.us-east-1.amazonaws.com/", v)
 	if err != nil {
 		log.Fatal(err)
 	}
